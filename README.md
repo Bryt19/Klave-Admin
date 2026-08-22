@@ -1,6 +1,6 @@
+![Klavora Brand Header](public/favicon.svg)
 # Klavora Admin Console
 
-![Klavora Brand Header](public/favicon.svg)
 
 An executive-grade, real-time administrative platform for **Klavora** — managing independent pharmacy subscriptions, platform MRR metrics, batch inventory movements, and customer support tickets across Ghana.
 
