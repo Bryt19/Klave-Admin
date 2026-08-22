@@ -13,7 +13,7 @@ function getBadgeThemeClass(label: string): string {
   if (norm === 'scale' || norm === 'purple' || norm === 'reconciliation' || norm === 'feature request') return 'badge-purple';
   if (norm === 'trial' || norm === 'warning' || norm === 'reversal' || norm === 'open' || norm === 'expiring' || norm === 'amber') return 'badge-amber';
   if (norm === 'active' || norm === 'success' || norm === 'restock' || norm === 'resolved') return 'badge-emerald';
-  if (norm === 'churned' || norm === 'overdue' || norm === 'danger' || norm === 'bug report') return 'badge-rose';
+  if (norm === 'suspended' || norm === 'overdue' || norm === 'danger' || norm === 'bug report') return 'badge-rose';
 
   return 'badge-slate';
 }

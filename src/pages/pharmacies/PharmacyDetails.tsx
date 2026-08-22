@@ -48,7 +48,6 @@ export default function PharmacyDetail() {
           <p className="text-[12px] font-mono font-medium" style={{ color: 'var(--text-secondary)' }}>{pharmacy.id}</p>
         </div>
         <div className="ml-auto flex items-center gap-2">
-          <Badge label={pharmacy.plan} size="sm" />
           <Badge label={pharmacy.status} size="sm" />
         </div>
       </div>

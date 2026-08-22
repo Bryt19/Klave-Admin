@@ -1,156 +1,86 @@
 import { useState } from 'react';
+import SettingsAccount from './components/SettingsAccount';
+import SettingsPlatform from './components/SettingsPlatform';
+import SettingsNotifications from './components/SettingsNotifications';
+import SettingsBilling from './components/SettingsBilling';
+import SettingsSecurity from './components/SettingsSecurity';
+import SettingsBackup from './components/SettingsBackup';
+import SettingsDangerZone from './components/SettingsDangerZone';
 
-const plans = [
-  { name: 'Starter', price: 350, features: ['Up to 150 drugs', '3 staff members', 'Basic reports', 'Email support'] },
-  { name: 'Growth', price: 850, features: ['Up to 400 drugs', '8 staff members', 'Advanced reports', 'Priority support', 'Batch analytics'] },
-  { name: 'Scale', price: 1500, features: ['Unlimited drugs', 'Unlimited staff', 'Full analytics suite', 'Dedicated support', 'API access', 'Custom exports'] },
+const operations = [
+  { id: 'account', title: 'Account', desc: 'Manage your profile and sessions', icon: 'ri-shield-user-line' },
+  { id: 'platform', title: 'Platform Configuration', desc: 'Trials, plans, and maintenance', icon: 'ri-settings-4-line' },
+  { id: 'notifications', title: 'Notifications', desc: 'Configure platform alerts', icon: 'ri-notification-3-line' },
+  { id: 'billing', title: 'Billing and Revenue', desc: 'MRR and Paystack setup', icon: 'ri-bank-card-line' },
+  { id: 'security', title: 'Security', desc: 'Access control and 2FA', icon: 'ri-lock-2-line' },
+  { id: 'backup', title: 'Backup & Restore', desc: 'Server data recovery', icon: 'ri-database-2-line' },
+  { id: 'danger', title: 'Danger Zone', desc: 'Destructive platform actions', icon: 'ri-error-warning-line', color: 'var(--danger)' },
 ];
 
 export default function SettingsPage() {
-  const [notifs, setNotifs] = useState({ newSignups: true, overdueSubscriptions: true, criticalTickets: true, weeklyReport: false });
-  const [broadcastMsg, setBroadcastMsg] = useState('');
-  const [broadcastTier, setBroadcastTier] = useState('all');
-  const [editPlan, setEditPlan] = useState<string | null>(null);
-  const [planPrices, setPlanPrices] = useState<Record<string, number>>({ Starter: 350, Growth: 850, Scale: 1500 });
-  const [toast, setToast] = useState('');
-  const [founderName, setFounderName] = useState('Kwame Founder');
-  const [founderEmail, setFounderEmail] = useState('admin@klavora.io');
+  const [activeTab, setActiveTab] = useState('account');
 
-  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
+  const activeOp = operations.find(o => o.id === activeTab);
 
   return (
-    <div className="p-4 sm:p-6 space-y-6 max-w-3xl">
-      {toast && <div className="fixed top-4 right-4 z-50 px-4 py-2.5 rounded-lg text-[13px] font-body text-white bg-success">{toast}</div>}
-
-      <div>
-        <h1 className="font-heading font-700 text-[22px]" style={{ color: 'var(--text-primary)' }}>Settings</h1>
-        <p className="text-[13px] mt-0.5 font-body" style={{ color: 'var(--text-secondary)' }}>Manage your founder account, notifications, plans, and broadcasts</p>
+    <div className="p-4 sm:p-6 h-full flex flex-col">
+      <div className="mb-6 shrink-0">
+        <h1 className="font-heading font-700 text-[24px]" style={{ color: 'var(--text-primary)' }}>Settings</h1>
+        <p className="text-[13px] mt-0.5 font-body" style={{ color: 'var(--text-secondary)' }}>Owner-only operations and platform configuration</p>
       </div>
 
-      {/* Account */}
-      <div className="rounded-xl p-4 sm:p-5 space-y-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-        <h2 className="font-heading font-600 text-[14px]" style={{ color: 'var(--text-primary)' }}>Founder Account</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {[
-            { label: 'Full Name', value: founderName, set: setFounderName },
-            { label: 'Email Address', value: founderEmail, set: setFounderEmail },
-          ].map(f => (
-            <div key={f.label}>
-              <label className="block text-[11px] uppercase tracking-wider font-body font-600 mb-1.5" style={{ color: 'var(--text-secondary)' }}>{f.label}</label>
-              <input value={f.value} onChange={e => f.set(e.target.value)}
-                className="w-full h-9 px-3 rounded-lg text-[13px] font-body outline-none focus:ring-1 focus:ring-primary"
-                style={{ background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} />
-            </div>
-          ))}
-        </div>
-        <div>
-          <label className="block text-[11px] uppercase tracking-wider font-body font-600 mb-1.5" style={{ color: 'var(--text-secondary)' }}>New Password</label>
-          <input type="password" placeholder="Leave blank to keep current"
-            className="w-full h-9 px-3 rounded-lg text-[13px] font-body outline-none focus:ring-1 focus:ring-primary"
-            style={{ background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} />
-        </div>
-        <div className="flex justify-end">
-          <button onClick={() => showToast('Account details saved.')}
-            className="h-9 px-4 rounded-lg text-[13px] font-body font-medium cursor-pointer transition-colors whitespace-nowrap bg-primary text-white hover:bg-primary/90">
-            Save Changes
-          </button>
-        </div>
-      </div>
-
-      {/* Notifications */}
-      <div className="rounded-xl p-4 sm:p-5 space-y-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-        <h2 className="font-heading font-600 text-[14px]" style={{ color: 'var(--text-primary)' }}>Notification Preferences</h2>
-        {[
-          { key: 'newSignups', label: 'New pharmacy signups', desc: 'Get notified when a new pharmacy registers' },
-          { key: 'overdueSubscriptions', label: 'Overdue subscriptions', desc: 'Alert when a subscription becomes overdue' },
-          { key: 'criticalTickets', label: 'Critical support tickets', desc: 'Notify on new bug reports and urgent requests' },
-          { key: 'weeklyReport', label: 'Weekly platform report', desc: 'Summary of signups, MRR, and activity every Monday' },
-        ].map(n => (
-          <div key={n.key} className="flex items-center justify-between py-2" style={{ borderBottom: '1px solid var(--border)' }}>
-            <div>
-              <p className="text-[13px] font-body font-semibold" style={{ color: 'var(--text-primary)' }}>{n.label}</p>
-              <p className="text-[12px] font-body" style={{ color: 'var(--text-secondary)' }}>{n.desc}</p>
-            </div>
-            <button onClick={() => setNotifs(prev => ({ ...prev, [n.key]: !prev[n.key as keyof typeof prev] }))}
-              className={`w-10 h-5 rounded-full transition-colors cursor-pointer relative ${notifs[n.key as keyof typeof notifs] ? 'bg-primary' : 'bg-slate-300 dark:bg-slate-600'}`}>
-              <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${notifs[n.key as keyof typeof notifs] ? 'left-5' : 'left-0.5'}`} />
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {/* Plan Management */}
-      <div className="rounded-xl p-4 sm:p-5 space-y-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-        <h2 className="font-heading font-600 text-[14px]" style={{ color: 'var(--text-primary)' }}>Plan Management</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {plans.map(p => (
-            <div key={p.name} className="rounded-xl p-4 space-y-3" style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}>
-              <div className="flex items-center justify-between">
-                <span className="font-heading font-700 text-[14px]" style={{ color: 'var(--text-primary)' }}>{p.name}</span>
-                <button onClick={() => setEditPlan(editPlan === p.name ? null : p.name)}
-                  className="text-[11px] text-primary font-body font-semibold cursor-pointer hover:underline whitespace-nowrap">
-                  {editPlan === p.name ? 'Done' : 'Edit'}
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 flex-1 min-h-0">
+        {/* Operations Sidebar */}
+        <div className="w-full lg:w-[280px] shrink-0">
+          <p className="text-[10px] uppercase tracking-wider font-heading font-700 mb-3 ml-2" style={{ color: 'var(--text-muted)' }}>
+            Operations
+          </p>
+          <div className="rounded-xl overflow-hidden p-2 space-y-1" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+            {operations.map(op => {
+              const isActive = activeTab === op.id;
+              const isDanger = op.id === 'danger';
+              return (
+                <button
+                  key={op.id}
+                  onClick={() => setActiveTab(op.id)}
+                  className={`w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors cursor-pointer ${isActive ? (isDanger ? 'bg-red-500/10' : 'bg-black/5 dark:bg-white/5') : 'hover:bg-black/5 dark:hover:bg-white/5'}`}
+                >
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isActive ? (isDanger ? 'bg-red-500/20 text-red-500' : 'bg-primary/10 text-primary') : 'bg-[var(--bg)] text-[var(--text-secondary)]'}`}>
+                    <i className={`${op.icon} text-[16px]`} style={{ color: !isActive && op.color ? op.color : undefined }}></i>
+                  </div>
+                  <div>
+                    <p className={`text-[13px] font-heading font-600 ${isActive ? (isDanger ? 'text-red-500' : 'text-[var(--text-primary)]') : (op.color ? 'text-red-500' : 'text-[var(--text-secondary)]')}`}>
+                      {op.title}
+                    </p>
+                    <p className="text-[11px] font-body mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                      {op.desc}
+                    </p>
+                  </div>
                 </button>
-              </div>
-              {editPlan === p.name ? (
-                <div>
-                  <label className="text-[10px] uppercase tracking-wider font-body font-600" style={{ color: 'var(--text-secondary)' }}>Price (GH₵/mo)</label>
-                  <input type="number" value={planPrices[p.name]} onChange={e => setPlanPrices(prev => ({ ...prev, [p.name]: Number(e.target.value) }))}
-                    className="w-full h-8 px-2 rounded-lg text-[13px] font-mono outline-none focus:ring-1 focus:ring-primary mt-1"
-                    style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} />
-                </div>
-              ) : (
-                <p className="text-[20px] font-mono font-700 text-emerald-600 dark:text-emerald-400">GH₵{planPrices[p.name]}<span className="text-[12px] font-body text-slate-500">/mo</span></p>
-              )}
-              <ul className="space-y-1">
-                {p.features.map(f => (
-                  <li key={f} className="flex items-center gap-1.5 text-[12px] font-body" style={{ color: 'var(--text-secondary)' }}>
-                    <i className="ri-check-line text-emerald-600 text-[12px]" />{f}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+              );
+            })}
+          </div>
         </div>
-        <div className="flex justify-end">
-          <button onClick={() => showToast('Plan changes saved.')}
-            className="h-9 px-4 rounded-lg text-[13px] font-body font-medium cursor-pointer transition-colors whitespace-nowrap bg-primary text-white hover:bg-primary/90">
-            Save Plan Changes
-          </button>
-        </div>
-      </div>
 
-      {/* Broadcast */}
-      <div className="rounded-xl p-5 space-y-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-        <div>
-          <h2 className="font-heading font-600 text-[14px]" style={{ color: 'var(--text-primary)' }}>Broadcast Message</h2>
-          <p className="text-[12px] font-body mt-0.5" style={{ color: 'var(--text-secondary)' }}>Send a banner notification to pharmacies on their next login</p>
-        </div>
-        <div>
-          <label className="block text-[11px] uppercase tracking-wider font-body font-600 mb-1.5" style={{ color: 'var(--text-secondary)' }}>Target Audience</label>
-          <select value={broadcastTier} onChange={e => setBroadcastTier(e.target.value)}
-            className="h-9 px-3 rounded-lg text-[13px] font-body font-medium outline-none focus:ring-1 focus:ring-primary cursor-pointer"
-            style={{ background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
-            <option value="all">All Pharmacies</option>
-            <option value="Starter">Starter Plan Only</option>
-            <option value="Growth">Growth Plan Only</option>
-            <option value="Scale">Scale Plan Only</option>
-            <option value="Trial">Trial Pharmacies Only</option>
-          </select>
-        </div>
-        <div>
-          <label className="block text-[11px] uppercase tracking-wider font-body font-600 mb-1.5" style={{ color: 'var(--text-secondary)' }}>Message</label>
-          <textarea value={broadcastMsg} onChange={e => setBroadcastMsg(e.target.value)} rows={4}
-            placeholder="e.g. We're rolling out PDF export on April 25th. No action needed on your end."
-            className="w-full rounded-lg px-3 py-2 text-[13px] font-body resize-none outline-none focus:ring-1 focus:ring-primary"
-            style={{ background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} />
-        </div>
-        <div className="flex justify-end">
-          <button onClick={() => { if (broadcastMsg.trim()) { showToast(`Broadcast sent to ${broadcastTier === 'all' ? 'all pharmacies' : broadcastTier + ' plan'}.`); setBroadcastMsg(''); } }}
-            disabled={!broadcastMsg.trim()}
-            className="h-9 px-4 rounded-lg text-[13px] font-body font-medium cursor-pointer transition-colors whitespace-nowrap bg-primary text-white hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed">
-            Send Broadcast
-          </button>
+        {/* Content Area */}
+        <div className="flex-1 min-w-0 max-w-4xl overflow-y-auto pr-2 pb-10 space-y-4">
+          
+          <div className="p-5 rounded-xl mb-4" style={{ background: 'var(--surface)', border: activeTab === 'danger' ? '1px solid var(--danger)' : '1px solid var(--border)' }}>
+             <h2 className="text-[16px] font-heading font-700 flex items-center gap-2" style={{ color: activeTab === 'danger' ? 'var(--danger)' : 'var(--text-primary)' }}>
+               <i className={`${activeOp?.icon}`}></i>
+               {activeOp?.title}
+             </h2>
+             <p className="text-[13px] mt-1 font-body" style={{ color: 'var(--text-secondary)' }}>{activeOp?.desc}</p>
+          </div>
+
+          {activeTab === 'account' && <SettingsAccount />}
+          {activeTab === 'platform' && <SettingsPlatform />}
+          {activeTab === 'notifications' && <SettingsNotifications />}
+          {activeTab === 'billing' && <SettingsBilling />}
+          {activeTab === 'security' && <SettingsSecurity />}
+          {activeTab === 'backup' && <SettingsBackup />}
+          {activeTab === 'danger' && <SettingsDangerZone />}
+
         </div>
       </div>
     </div>

@@ -18,6 +18,7 @@ const navItems = [
   { path: '/subscriptions', label: 'Subscriptions', icon: 'ri-bank-card-line' },
   { path: '/support', label: 'Support', icon: 'ri-customer-service-2-line' },
   { path: '/activity', label: 'Activity', icon: 'ri-pulse-line' },
+  { path: '/staff', label: 'Staff', icon: 'ri-team-line' },
   { path: '/settings', label: 'Settings', icon: 'ri-settings-3-line' },
 ];
 
@@ -85,6 +86,17 @@ export default function Sidebar({
             <Logo size="sm" showWordmark={!collapsed || mobileOpen} />
           </div>
 
+          {/* Collapse toggle on desktop */}
+          {!mobileOpen && (
+            <button
+              onClick={onToggleCollapse}
+              className="hidden md:flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              <i className={`${collapsed ? 'ri-arrow-right-s-line' : 'ri-arrow-left-s-line'} text-[18px]`} />
+            </button>
+          )}
+
           {/* Close button on mobile */}
           <button
             onClick={onCloseMobile}
@@ -103,8 +115,8 @@ export default function Sidebar({
               to={item.path}
               end={item.exact}
               onClick={handleNavClick}
-              onMouseEnter={(e: React.MouseEvent) => setTooltip({ text: item.label, x: e.clientX, y: e.clientY })}
-              onMouseMove={(e: React.MouseEvent) => setTooltip(prev => prev ? { ...prev, x: e.clientX, y: e.clientY } : null)}
+              onMouseEnter={(e: React.MouseEvent) => { if (collapsed && !mobileOpen) setTooltip({ text: item.label, x: e.clientX, y: e.clientY }); }}
+              onMouseMove={(e: React.MouseEvent) => { if (collapsed && !mobileOpen) setTooltip(prev => prev ? { ...prev, x: e.clientX, y: e.clientY } : null); }}
               onMouseLeave={() => setTooltip(null)}
               className={({ isActive }) =>
                 `relative flex items-center h-10 px-4 gap-3 cursor-pointer transition-colors duration-100 group ${
@@ -158,23 +170,22 @@ export default function Sidebar({
             )}
           </button>
 
-          {/* Desktop Collapse toggle */}
+          {/* Sign Out */}
           <button
-            onClick={onToggleCollapse}
-            className={`hidden md:flex items-center h-10 px-4 gap-3 w-full cursor-pointer transition-colors hover:bg-primary/5 ${
-              collapsed ? 'justify-center' : ''
+            onClick={() => setShowLogoutModal(true)}
+            className={`flex items-center h-10 px-4 gap-3 w-full cursor-pointer transition-colors hover:bg-rose-500/10 text-rose-500 ${
+              collapsed && !mobileOpen ? 'md:justify-center' : ''
             }`}
-            style={{ color: 'var(--text-secondary)' }}
           >
             <div className="w-5 h-5 flex items-center justify-center shrink-0">
-              <i className={`${collapsed ? 'ri-arrow-right-s-line' : 'ri-arrow-left-s-line'} text-[16px]`} />
+              <i className="ri-logout-box-r-line text-[16px]" />
             </div>
-            {!collapsed && (
-              <span className="text-[13px] font-medium font-body whitespace-nowrap">Collapse</span>
+            {(!collapsed || mobileOpen) && (
+              <span className="text-[13px] font-medium font-body whitespace-nowrap">Sign out</span>
             )}
           </button>
 
-          {/* Founder avatar & logout */}
+          {/* Founder avatar */}
           <div
             className={`flex items-center h-12 px-4 gap-3 mt-1 ${
               collapsed && !mobileOpen ? 'md:justify-center' : ''
@@ -192,15 +203,6 @@ export default function Sidebar({
                   admin@klavora.io
                 </p>
               </div>
-            )}
-            {(!collapsed || mobileOpen) && (
-              <button
-                onClick={() => setShowLogoutModal(true)}
-                title="Sign out"
-                className="w-7 h-7 flex items-center justify-center rounded-lg cursor-pointer transition-colors hover:bg-rose-500/10 text-rose-500 shrink-0"
-              >
-                <i className="ri-logout-box-r-line text-[15px]" />
-              </button>
             )}
           </div>
         </div>
