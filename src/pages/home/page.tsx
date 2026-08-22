@@ -125,32 +125,39 @@ export default function OverviewPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Recent Signups */}
         <div className="rounded-xl overflow-hidden" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-          <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid var(--border)' }}>
+          <div className="flex items-center justify-between px-4 sm:px-5 py-4" style={{ borderBottom: '1px solid var(--border)' }}>
             <div>
               <h2 className="font-heading font-600 text-[14px]" style={{ color: 'var(--text-primary)' }}>Recent Signups</h2>
               <p className="text-[11px] font-body" style={{ color: 'var(--text-secondary)' }}>Latest pharmacies added to the network</p>
             </div>
-            <button onClick={() => navigate('/pharmacies')} className="text-[12px] text-primary font-body font-500 cursor-pointer hover:underline whitespace-nowrap">View all</button>
+            <button onClick={() => navigate('/pharmacies')} className="text-[12px] text-sky-600 dark:text-sky-400 font-body font-600 cursor-pointer hover:underline whitespace-nowrap">View all</button>
           </div>
           <div className="divide-y" style={{ borderColor: 'var(--border)' }}>
             {recentSignups.map((p) => (
               <div
                 key={p.id}
-                className="flex items-center gap-2.5 px-4 sm:px-5 py-3 table-row-hover cursor-pointer"
-                style={{ borderBottom: '1px solid var(--border)' }}
+                className="p-3.5 sm:px-5 sm:py-3.5 table-row-hover cursor-pointer space-y-2 sm:space-y-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
                 onClick={() => navigate(`/pharmacies/${p.id}`)}
+                style={{ borderBottom: '1px solid var(--border)' }}
               >
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <span className="text-primary text-[11px] font-mono font-700">{p.name.slice(0, 2).toUpperCase()}</span>
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-9 h-9 rounded-lg bg-sky-500/10 flex items-center justify-center shrink-0">
+                    <span className="text-sky-600 dark:text-sky-400 text-[12px] font-mono font-700">{p.name.slice(0, 2).toUpperCase()}</span>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[13px] font-semibold font-body truncate" style={{ color: 'var(--text-primary)' }}>{p.name}</p>
+                    <p className="text-[11px] font-body truncate" style={{ color: 'var(--text-secondary)' }}>{p.region}</p>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-semibold font-body truncate" style={{ color: 'var(--text-primary)' }}>{p.name}</p>
-                  <p className="text-[11px] font-body truncate" style={{ color: 'var(--text-secondary)' }}>{p.region}</p>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <Badge label={p.plan} />
-                  <span className="hidden sm:inline-flex"><Badge label={p.status} /></span>
-                  <p className="hidden sm:block text-[11px] font-mono" style={{ color: 'var(--text-secondary)' }}>{formatDate(p.joined)}</p>
+
+                <div className="flex items-center justify-between sm:justify-end gap-2.5 shrink-0 pt-1.5 sm:pt-0 border-t sm:border-t-0 border-dashed border-slate-200 dark:border-slate-800">
+                  <div className="flex items-center gap-1.5">
+                    <Badge label={p.plan} />
+                    <Badge label={p.status} />
+                  </div>
+                  <span className="text-[11px] font-mono font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
+                    {formatDate(p.joined)}
+                  </span>
                 </div>
               </div>
             ))}
@@ -159,31 +166,31 @@ export default function OverviewPage() {
 
         {/* Recent Support Tickets */}
         <div className="rounded-xl overflow-hidden" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-          <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid var(--border)' }}>
+          <div className="flex items-center justify-between px-4 sm:px-5 py-4" style={{ borderBottom: '1px solid var(--border)' }}>
             <div>
               <h2 className="font-heading font-600 text-[14px]" style={{ color: 'var(--text-primary)' }}>Recent Support Tickets</h2>
               <p className="text-[11px] font-body" style={{ color: 'var(--text-secondary)' }}>Pending questions and bug reports</p>
             </div>
-            <button onClick={() => navigate('/support')} className="text-[12px] text-primary font-body font-500 cursor-pointer hover:underline whitespace-nowrap">View all</button>
+            <button onClick={() => navigate('/support')} className="text-[12px] text-sky-600 dark:text-sky-400 font-body font-600 cursor-pointer hover:underline whitespace-nowrap">View all</button>
           </div>
-          <div>
+          <div className="divide-y" style={{ borderColor: 'var(--border)' }}>
             {recentTickets.map((t) => (
               <div
                 key={t.id}
-                className="flex items-start gap-3 px-5 py-3 table-row-hover cursor-pointer"
+                className="p-3.5 sm:px-5 sm:py-3.5 table-row-hover cursor-pointer flex items-start justify-between gap-3"
                 style={{ borderBottom: '1px solid var(--border)' }}
                 onClick={() => navigate('/support')}
               >
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap sm:flex-nowrap">
                     <Badge label={t.type} />
-                    <p className="text-[12px] font-medium font-body truncate" style={{ color: 'var(--text-primary)' }}>{t.subject}</p>
+                    <p className="text-[12px] font-semibold font-body truncate" style={{ color: 'var(--text-primary)' }}>{t.subject}</p>
                   </div>
                   <p className="text-[11px] font-body" style={{ color: 'var(--text-secondary)' }}>{t.pharmacyName}</p>
                 </div>
                 <div className="flex flex-col items-end gap-1 shrink-0">
                   <Badge label={t.status} />
-                  <p className="text-[11px] font-mono" style={{ color: 'var(--text-secondary)' }}>{timeAgo(t.date)}</p>
+                  <p className="text-[11px] font-mono font-medium" style={{ color: 'var(--text-secondary)' }}>{timeAgo(t.date)}</p>
                 </div>
               </div>
             ))}
@@ -192,53 +199,58 @@ export default function OverviewPage() {
       </div>
 
       {/* Signups Chart */}
-      <div className="rounded-xl p-5" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-        <div className="flex items-center justify-between mb-5">
+      <div className="rounded-xl p-4 sm:p-5" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+        <div className="flex items-center justify-between mb-4 sm:mb-5">
           <div>
             <h2 className="font-heading font-600 text-[14px]" style={{ color: 'var(--text-primary)' }}>New Signups per Week</h2>
             <p className="text-[12px] font-body mt-0.5" style={{ color: 'var(--text-secondary)' }}>Last 12 weeks registration trend</p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-primary" />
+            <div className="w-2.5 h-2.5 rounded-full bg-sky-500" />
             <span className="text-[12px] font-body font-medium" style={{ color: 'var(--text-secondary)' }}>Signups</span>
           </div>
         </div>
-        <div className="flex items-end gap-2 h-40">
-          {signupChartData.map((d, i) => (
-            <div
-              key={d.week}
-              className="flex-1 flex flex-col items-center gap-1 cursor-pointer group"
-              onMouseEnter={() => setHoveredBar(i)}
-              onMouseLeave={() => setHoveredBar(null)}
-            >
-              {hoveredBar === i && (
+
+        <div className="overflow-x-auto pb-2">
+          <div className="min-w-[400px]">
+            <div className="flex items-end gap-2 h-36 sm:h-40">
+              {signupChartData.map((d, i) => (
                 <div
-                  className="text-[11px] font-mono px-1.5 py-0.5 rounded font-600 shadow-sm"
-                  style={{ background: 'var(--text-primary)', color: 'var(--bg)' }}
+                  key={d.week}
+                  className="flex-1 flex flex-col items-center gap-1 cursor-pointer group"
+                  onMouseEnter={() => setHoveredBar(i)}
+                  onMouseLeave={() => setHoveredBar(null)}
                 >
-                  {d.signups}
+                  {hoveredBar === i && (
+                    <div
+                      className="text-[11px] font-mono px-1.5 py-0.5 rounded font-600 shadow-sm"
+                      style={{ background: 'var(--text-primary)', color: 'var(--bg)' }}
+                    >
+                      {d.signups}
+                    </div>
+                  )}
+                  <div
+                    className="w-full rounded-t-md transition-all duration-150"
+                    style={{
+                      height: `${(d.signups / maxSignups) * 120}px`,
+                      background: hoveredBar === i ? '#0EA5E9' : 'rgba(14,165,233,0.4)',
+                      minHeight: '4px',
+                    }}
+                  />
+                  <span className="text-[10px] font-mono font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
+                    {d.week.split(' ')[0]}
+                  </span>
                 </div>
-              )}
-              <div
-                className="w-full rounded-t-md transition-all duration-150"
-                style={{
-                  height: `${(d.signups / maxSignups) * 120}px`,
-                  background: hoveredBar === i ? '#0EA5E9' : 'rgba(14,165,233,0.35)',
-                  minHeight: '4px',
-                }}
-              />
-              <span className="text-[10px] font-mono font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
-                {d.week.split(' ')[0]}
-              </span>
+              ))}
             </div>
-          ))}
-        </div>
-        <div className="flex justify-between mt-1">
-          {signupChartData.map((d) => (
-            <span key={d.week} className="flex-1 text-center text-[10px] font-body font-medium" style={{ color: 'var(--text-secondary)' }}>
-              {d.week.includes('W1') ? d.week.split(' ')[1] : ''}
-            </span>
-          ))}
+            <div className="flex justify-between mt-1">
+              {signupChartData.map((d) => (
+                <span key={d.week} className="flex-1 text-center text-[10px] font-body font-medium" style={{ color: 'var(--text-secondary)' }}>
+                  {d.week.includes('W1') ? d.week.split(' ')[1] : ''}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

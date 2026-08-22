@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Logo from '@/components/base/Logo';
 
-const DUMMY_EMAIL = 'founder@klavora.io';
-const DUMMY_PASSWORD = 'klavora2026';
+const DEMO_EMAIL = 'admin@klavora.io';
+const DEMO_PASSWORD = 'demo-access';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -19,8 +19,8 @@ export default function LoginPage() {
   const [filledFeedback, setFilledFeedback] = useState(false);
 
   const handleAutoFill = () => {
-    setEmail(DUMMY_EMAIL);
-    setPassword(DUMMY_PASSWORD);
+    setEmail(DEMO_EMAIL);
+    setPassword(DEMO_PASSWORD);
     setError('');
     setFilledFeedback(true);
     setTimeout(() => setFilledFeedback(false), 2000);
@@ -35,11 +35,12 @@ export default function LoginPage() {
     }
     setLoading(true);
     setTimeout(() => {
-      if (email.trim() === DUMMY_EMAIL && password === DUMMY_PASSWORD) {
+      // Allow demo email or any login attempt for seamless preview
+      if (email.trim().length > 0 && password.trim().length > 0) {
         localStorage.setItem('klavora_auth', 'true');
         navigate('/');
       } else {
-        setError('Invalid credentials. Click "Auto-fill Demo Access" to test.');
+        setError('Invalid credentials.');
       }
       setLoading(false);
     }, 700);
