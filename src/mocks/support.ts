@@ -53,7 +53,7 @@ export const supportTickets: SupportTicket[] = [
     date: '2026-04-11T14:05:00',
     status: 'In Progress',
     replies: [
-      { id: 'R001', author: 'Founder', isFounder: true, message: 'Hi Nana! Multi-branch support is on our roadmap for Q3 2026. For now, you would need a separate account for each branch. I can offer you a 20% discount on the second subscription — let me know if you\'d like that.', timestamp: '2026-04-11T16:30:00' },
+      { id: 'R001', author: 'Super Admin', isFounder: true, message: 'Hi Nana! Multi-branch support is on our roadmap for Q3 2026. For now, you would need a separate account for each branch. I can offer you a 20% discount on the second subscription — let me know if you\'d like that.', timestamp: '2026-04-11T16:30:00' },
       { id: 'R002', author: 'Nana Acheampong', isFounder: false, message: 'That would be great! Please apply the discount. The new branch will be on the Growth plan as well.', timestamp: '2026-04-12T08:15:00' },
     ],
     internalNotes: 'Apply 20% discount coupon when second account is created. Flag for multi-branch feature prioritization.',
@@ -84,7 +84,7 @@ export const supportTickets: SupportTicket[] = [
     date: '2026-04-09T16:20:00',
     status: 'In Progress',
     replies: [
-      { id: 'R003', author: 'Founder', isFounder: true, message: 'Hi Adjoa, PDF export is being added in our next release (April 25th). I\'ll personally notify you when it\'s live. In the meantime, I can generate a PDF report manually for you — just let me know the date range.', timestamp: '2026-04-09T18:00:00' },
+      { id: 'R003', author: 'Super Admin', isFounder: true, message: 'Hi Adjoa, PDF export is being added in our next release (April 25th). I\'ll personally notify you when it\'s live. In the meantime, I can generate a PDF report manually for you — just let me know the date range.', timestamp: '2026-04-09T18:00:00' },
     ],
     internalNotes: 'PDF export feature is in dev. Manually generate report for PH015 if needed before April 25.',
   },

@@ -2,30 +2,32 @@ import { useState } from 'react';
 import Badge from '@/components/base/Badge';
 import { activityFeed, type MovementType } from '@/mocks/activity';
 
-const movementConfig: Record<MovementType, { icon: string; iconColor: string; bg: string }> = {
-  Sale: { icon: 'ri-shopping-cart-line', iconColor: 'text-sky-700 dark:text-sky-300', bg: 'bg-sky-100 dark:bg-sky-950/80 border border-sky-300/80 dark:border-sky-800/60' },
-  Restock: { icon: 'ri-add-circle-line', iconColor: 'text-emerald-700 dark:text-emerald-300', bg: 'bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-300/80 dark:border-emerald-800/60' },
-  Reversal: { icon: 'ri-arrow-go-back-line', iconColor: 'text-amber-800 dark:text-amber-300', bg: 'bg-amber-100 dark:bg-amber-950/80 border border-amber-300/80 dark:border-amber-800/60' },
-  Reconciliation: { icon: 'ri-equalizer-line', iconColor: 'text-purple-700 dark:text-purple-300', bg: 'bg-purple-100 dark:bg-purple-950/80 border border-purple-300/80 dark:border-purple-800/60' },
-};
+const PAGE_SIZES = [10, 25, 'All'] as const;
 
 function formatTime(ts: string) {
   return new Date(ts).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 }
 
 const pharmacyNames: string[] = Array.from(new Set(activityFeed.map(a => a.pharmacyName)));
-const movementTypes: MovementType[] = ['Sale', 'Restock', 'Reversal', 'Reconciliation'];
+const movementTypes: MovementType[] = ['Sell', 'Edit', 'Restock', 'Delete'];
 
 export default function ActivityPage() {
   const [filterPharmacy, setFilterPharmacy] = useState('');
   const [filterMovement, setFilterMovement] = useState('');
   const [filterDate, setFilterDate] = useState('');
+  const [pageSize, setPageSize] = useState<typeof PAGE_SIZES[number]>(10);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filtered = activityFeed.filter(a =>
     (!filterPharmacy || a.pharmacyName === filterPharmacy) &&
     (!filterMovement || a.movement === filterMovement) &&
     (!filterDate || a.timestamp.startsWith(filterDate))
   );
+
+  const totalPages = pageSize === 'All' ? 1 : Math.ceil(filtered.length / pageSize);
+  const paginated = pageSize === 'All'
+    ? filtered
+    : filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <div className="p-4 sm:p-6 space-y-5">
@@ -36,30 +38,40 @@ export default function ActivityPage() {
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
-        <select value={filterPharmacy} onChange={e => setFilterPharmacy(e.target.value)}
+        <select value={filterPharmacy} onChange={e => { setFilterPharmacy(e.target.value); setCurrentPage(1); }}
           className="h-9 px-3 rounded-lg text-sm font-body font-medium outline-none focus:ring-1 focus:ring-primary cursor-pointer"
           style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
           <option value="">All Pharmacies</option>
           {pharmacyNames.map(n => <option key={n} value={n}>{n}</option>)}
         </select>
-        <select value={filterMovement} onChange={e => setFilterMovement(e.target.value)}
+        <select value={filterMovement} onChange={e => { setFilterMovement(e.target.value); setCurrentPage(1); }}
           className="h-9 px-3 rounded-lg text-sm font-body font-medium outline-none focus:ring-1 focus:ring-primary cursor-pointer"
           style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>
           <option value="">All Movements</option>
           {movementTypes.map(m => <option key={m} value={m}>{m}</option>)}
         </select>
-        <input type="date" value={filterDate} onChange={e => setFilterDate(e.target.value)}
+        <input type="date" value={filterDate} onChange={e => { setFilterDate(e.target.value); setCurrentPage(1); }}
           className="h-9 px-3 rounded-lg text-sm font-body font-medium outline-none focus:ring-1 focus:ring-primary cursor-pointer"
           style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} />
         {(filterPharmacy || filterMovement || filterDate) && (
-          <button onClick={() => { setFilterPharmacy(''); setFilterMovement(''); setFilterDate(''); }}
+          <button onClick={() => { setFilterPharmacy(''); setFilterMovement(''); setFilterDate(''); setCurrentPage(1); }}
             className="h-9 px-3 rounded-lg text-[12px] font-body font-medium cursor-pointer transition-colors hover:bg-danger/10 text-danger whitespace-nowrap"
             style={{ border: '1px solid var(--border)' }}>
             Clear filters
           </button>
         )}
-        <div className="flex items-center px-3 rounded-lg text-[12px] font-mono font-medium" style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}>
-          {filtered.length} entries
+        <div className="flex items-center gap-2">
+          <span className="text-[12px] font-body" style={{ color: 'var(--text-secondary)' }}>Per page</span>
+          <select
+            value={pageSize}
+            onChange={e => { setPageSize(e.target.value === 'All' ? 'All' : Number(e.target.value) as 10 | 25); setCurrentPage(1); }}
+            className="h-9 px-2.5 rounded-lg text-[12px] font-mono font-600 outline-none focus:ring-1 focus:ring-primary cursor-pointer"
+            style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+          >
+            {PAGE_SIZES.map(s => (
+              <option key={s} value={s}>{s === 'All' ? 'All' : s}</option>
+            ))}
+          </select>
         </div>
       </div>
 
@@ -75,9 +87,9 @@ export default function ActivityPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.length === 0 ? (
+              {paginated.length === 0 ? (
                 <tr><td colSpan={6} className="px-4 py-12 text-center text-[13px] font-body" style={{ color: 'var(--text-secondary)' }}>No activity matches your filters.</td></tr>
-              ) : filtered.map(a => (
+              ) : paginated.map(a => (
                 <tr key={a.id} className="table-row-hover" style={{ borderBottom: '1px solid var(--border)' }}>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
@@ -88,14 +100,7 @@ export default function ActivityPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3 text-[13px] font-body whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>{a.drugName}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 ${movementConfig[a.movement].bg}`}>
-                        <i className={`${movementConfig[a.movement].icon} text-[13px] ${movementConfig[a.movement].iconColor}`} />
-                      </div>
-                      <Badge label={a.movement} />
-                    </div>
-                  </td>
+                  <td className="px-4 py-3"><Badge label={a.movement} /></td>
                   <td className="px-4 py-3 text-[13px] font-mono font-700 whitespace-nowrap" style={{ color: 'var(--text-primary)' }}>{a.quantity}</td>
                   <td className="px-4 py-3 text-[13px] font-body whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>{a.staffName}</td>
                   <td className="px-4 py-3 text-[12px] font-mono whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>{formatTime(a.timestamp)}</td>
@@ -105,6 +110,47 @@ export default function ActivityPage() {
           </table>
         </div>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <p className="text-[12px] font-body" style={{ color: 'var(--text-secondary)' }}>
+            Showing {((currentPage - 1) * (pageSize as number)) + 1}–{Math.min(currentPage * (pageSize as number), filtered.length)} of {filtered.length}
+          </p>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-body cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/10"
+              style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+            >
+              <i className="ri-arrow-left-s-line text-[16px]" />
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-[12px] font-mono font-600 cursor-pointer transition-colors"
+                style={{
+                  background: currentPage === page ? 'var(--primary)' : 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  color: currentPage === page ? '#fff' : 'var(--text-primary)',
+                }}
+              >
+                {page}
+              </button>
+            ))}
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-body cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/10"
+              style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+            >
+              <i className="ri-arrow-right-s-line text-[16px]" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

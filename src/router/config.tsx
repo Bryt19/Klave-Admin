@@ -6,6 +6,7 @@ import SubscriptionsPage from '@/pages/subscriptions/page';
 import SupportPage from '@/pages/support/page';
 import ActivityPage from '@/pages/activity/page';
 import SettingsPage from '@/pages/settings/page';
+import StaffPage from '@/pages/staff/page';
 import LoginPage from '@/pages/auth/LoginPage';
 import NotFound from '@/pages/NotFound';
 
@@ -17,6 +18,7 @@ const routes: RouteObject[] = [
   { path: '/subscriptions', element: <SubscriptionsPage /> },
   { path: '/support', element: <SupportPage /> },
   { path: '/activity', element: <ActivityPage /> },
+  { path: '/staff', element: <StaffPage /> },
   { path: '/settings', element: <SettingsPage /> },
   { path: '*', element: <NotFound /> },
 ];

@@ -1,21 +1,24 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Badge from '@/components/base/Badge';
 import ConfirmModal from '@/components/base/ConfirmModal';
-import { pharmacies as allPharmacies, type Pharmacy, type Plan, type PharmacyStatus, type Region } from '@/mocks/pharmacies';
+import { pharmacies as allPharmacies, type Pharmacy, type PharmacyStatus, type Region } from '@/mocks/pharmacies';
 
-const plans: Plan[] = ['Starter', 'Growth', 'Scale', 'Trial'];
 const statuses: PharmacyStatus[] = ['Active', 'Trial', 'Churned', 'Suspended'];
 const regions: Region[] = ['Greater Accra', 'Ashanti', 'Western', 'Eastern', 'Northern', 'Volta', 'Central', 'Brong-Ahafo'];
+
+const ITEMS_PER_PAGE = 10;
 
 type SortKey = keyof Pharmacy;
 
 export default function PharmaciesPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
-  const [filterPlan, setFilterPlan] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [filterRegion, setFilterRegion] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [openActionId, setOpenActionId] = useState<string | null>(null);
+  const actionMenuRef = useRef<HTMLDivElement>(null);
   const [sortKey, setSortKey] = useState<SortKey>('joined');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
   const [suspendTarget, setSuspendTarget] = useState<Pharmacy | null>(null);
@@ -27,12 +30,21 @@ export default function PharmaciesPage() {
     setTimeout(() => setToast(''), 3000);
   };
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (actionMenuRef.current && !actionMenuRef.current.contains(e.target as Node)) {
+        setOpenActionId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const filtered = pharmacyList
     .filter(p => {
       const q = search.toLowerCase();
       return (
         (!q || p.name.toLowerCase().includes(q) || p.owner.toLowerCase().includes(q) || p.phone.includes(q)) &&
-        (!filterPlan || p.plan === filterPlan) &&
         (!filterStatus || p.status === filterStatus) &&
         (!filterRegion || p.region === filterRegion)
       );
@@ -43,9 +55,13 @@ export default function PharmaciesPage() {
       return sortDir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
     });
 
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
   const handleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
     else { setSortKey(key); setSortDir('asc'); }
+    setCurrentPage(1);
   };
 
   const handleSuspend = (_reason?: string) => {
@@ -75,25 +91,24 @@ export default function PharmaciesPage() {
           <i className="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-[14px]" style={{ color: 'var(--text-muted)' }} />
           <input
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={e => { setSearch(e.target.value); setCurrentPage(1); }}
             placeholder="Search pharmacies..."
             className="w-full h-9 pl-9 pr-3 rounded-lg text-sm font-body outline-none focus:ring-1 focus:ring-primary"
             style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
           />
         </div>
         {[
-          { label: 'Plan', value: filterPlan, set: setFilterPlan, options: plans },
           { label: 'Status', value: filterStatus, set: setFilterStatus, options: statuses },
           { label: 'Region', value: filterRegion, set: setFilterRegion, options: regions },
         ].map(f => (
           <select
             key={f.label}
             value={f.value}
-            onChange={e => f.set(e.target.value)}
+            onChange={e => { f.set(e.target.value); setCurrentPage(1); }}
             className="h-9 px-3 rounded-lg text-sm font-body font-medium outline-none focus:ring-1 focus:ring-primary cursor-pointer"
             style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
           >
-            <option value="">All {f.label}s</option>
+            <option value="">All {f.label === 'Status' ? 'Statuses' : f.label + 's'}</option>
             {f.options.map(o => <option key={o} value={o}>{o}</option>)}
           </select>
         ))}
@@ -131,13 +146,13 @@ export default function PharmaciesPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.length === 0 ? (
+              {paginated.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="px-4 py-12 text-center text-[13px] font-body" style={{ color: 'var(--text-muted)' }}>
                     No pharmacies match your filters. Try adjusting the search or filters above.
                   </td>
                 </tr>
-              ) : filtered.map(p => (
+              ) : paginated.map(p => (
                 <tr
                   key={p.id}
                   className="table-row-hover cursor-pointer"
@@ -160,10 +175,34 @@ export default function PharmaciesPage() {
                   <td className="px-4 py-3 text-[12px] font-mono whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>{p.joined}</td>
                   <td className="px-4 py-3 text-[12px] font-mono whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>{p.lastActive}</td>
                   <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
-                    <div className="flex items-center gap-1">
-                      <button onClick={() => navigate(`/pharmacies/${p.id}`)} className="h-7 px-2.5 rounded-md text-[11px] font-body font-medium cursor-pointer whitespace-nowrap transition-colors hover:bg-primary/10 text-primary">View</button>
-                      {p.status !== 'Suspended' && (
-                        <button onClick={() => setSuspendTarget(p)} className="h-7 px-2.5 rounded-md text-[11px] font-body font-medium cursor-pointer whitespace-nowrap transition-colors hover:bg-danger/10 text-danger">Suspend</button>
+                    <div className="relative" ref={openActionId === p.id ? actionMenuRef : undefined}>
+                      <button
+                        onClick={() => setOpenActionId(openActionId === p.id ? null : p.id)}
+                        className="w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer transition-colors hover:bg-primary/10"
+                        style={{ color: 'var(--text-secondary)' }}
+                      >
+                        <i className="ri-more-2-fill text-[16px]" />
+                      </button>
+                      {openActionId === p.id && (
+                        <div className="absolute right-0 top-full mt-1 z-50 w-44 py-1 rounded-xl shadow-xl border" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+                          <button
+                            onClick={() => { navigate(`/pharmacies/${p.id}`); setOpenActionId(null); }}
+                            className="w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-body font-medium transition-colors hover:bg-primary/10"
+                            style={{ color: 'var(--text-primary)' }}
+                          >
+                            <i className="ri-eye-line text-[14px]" style={{ color: 'var(--text-secondary)' }} />
+                            View Details
+                          </button>
+                          {p.status !== 'Suspended' && (
+                            <button
+                              onClick={() => { setSuspendTarget(p); setOpenActionId(null); }}
+                              className="w-full flex items-center gap-2.5 px-3 py-2 text-[12px] font-body font-medium transition-colors hover:bg-danger/10 text-danger"
+                            >
+                              <i className="ri-forbid-line text-[14px]" />
+                              Suspend
+                            </button>
+                          )}
+                        </div>
                       )}
                     </div>
                   </td>
@@ -173,6 +212,47 @@ export default function PharmaciesPage() {
           </table>
         </div>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <p className="text-[12px] font-body" style={{ color: 'var(--text-secondary)' }}>
+            Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filtered.length)} of {filtered.length}
+          </p>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-body cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/10"
+              style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+            >
+              <i className="ri-arrow-left-s-line text-[16px]" />
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-[12px] font-mono font-600 cursor-pointer transition-colors"
+                style={{
+                  background: currentPage === page ? 'var(--primary)' : 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  color: currentPage === page ? '#fff' : 'var(--text-primary)',
+                }}
+              >
+                {page}
+              </button>
+            ))}
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-body cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/10"
+              style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+            >
+              <i className="ri-arrow-right-s-line text-[16px]" />
+            </button>
+          </div>
+        </div>
+      )}
 
       <ConfirmModal
         isOpen={!!suspendTarget}
