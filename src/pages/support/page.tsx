@@ -36,7 +36,7 @@ export default function SupportPage() {
 
   const handleReply = () => {
     if (!reply.trim() || !selected) return;
-    const newReply = { id: `R${Date.now()}`, author: 'Founder', isFounder: true, message: reply, timestamp: new Date().toISOString() };
+    const newReply = { id: `R${Date.now()}`, author: 'Super Admin', isFounder: true, message: reply, timestamp: new Date().toISOString() };
     setTickets(prev => prev.map(t => t.id === selected.id ? { ...t, replies: [...t.replies, newReply] } : t));
     setSelected(prev => prev ? { ...prev, replies: [...prev.replies, newReply] } : null);
     setReply('');
@@ -183,7 +183,7 @@ export default function SupportPage() {
                         <span className="text-[10px] font-mono font-700">{r.author.slice(0,2).toUpperCase()}</span>
                       </div>
                       <span className="text-[12px] font-body font-semibold" style={{ color: 'var(--text-primary)' }}>{r.author}</span>
-                      {r.isFounder && <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-700 dark:text-sky-300 font-bold">Founder</span>}
+                      {r.isFounder && <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-700 dark:text-sky-300 font-bold">Super Admin</span>}
                       <span className="text-[11px] font-mono" style={{ color: 'var(--text-secondary)' }}>{timeAgo(r.timestamp)}</span>
                     </div>
                     <p className="text-[13px] font-body leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{r.message}</p>
@@ -195,7 +195,7 @@ export default function SupportPage() {
                   <div className="p-4 rounded-xl" style={{ background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.25)' }}>
                     <div className="flex items-center gap-2 mb-2">
                       <i className="ri-lock-line text-[13px] text-purple-700 dark:text-purple-300" />
-                      <span className="text-[11px] uppercase tracking-wider font-body font-700 text-purple-700 dark:text-purple-300">Internal Note (Founder Only)</span>
+                      <span className="text-[11px] uppercase tracking-wider font-body font-700 text-purple-700 dark:text-purple-300">Internal Note (Super Admin Only)</span>
                     </div>
                     <p className="text-[13px] font-body leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{selected.internalNotes}</p>
                   </div>

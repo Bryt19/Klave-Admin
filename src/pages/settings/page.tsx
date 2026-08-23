@@ -13,8 +13,8 @@ export default function SettingsPage() {
   const [editPlan, setEditPlan] = useState<string | null>(null);
   const [planPrices, setPlanPrices] = useState<Record<string, number>>({ Starter: 350, Growth: 850, Scale: 1500 });
   const [toast, setToast] = useState('');
-  const [founderName, setFounderName] = useState('Kwame Founder');
-  const [founderEmail, setFounderEmail] = useState('admin@klavora.io');
+  const [adminName, setAdminName] = useState('Kwame Admin');
+  const [adminEmail, setAdminEmail] = useState('admin@klavora.io');
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
 
@@ -24,16 +24,16 @@ export default function SettingsPage() {
 
       <div>
         <h1 className="font-heading font-700 text-[22px]" style={{ color: 'var(--text-primary)' }}>Settings</h1>
-        <p className="text-[13px] mt-0.5 font-body" style={{ color: 'var(--text-secondary)' }}>Manage your founder account, notifications, plans, and broadcasts</p>
+        <p className="text-[13px] mt-0.5 font-body" style={{ color: 'var(--text-secondary)' }}>Manage your Super Admin account, notifications, plans, and broadcasts</p>
       </div>
 
       {/* Account */}
       <div className="rounded-xl p-4 sm:p-5 space-y-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-        <h2 className="font-heading font-600 text-[14px]" style={{ color: 'var(--text-primary)' }}>Founder Account</h2>
+        <h2 className="font-heading font-600 text-[14px]" style={{ color: 'var(--text-primary)' }}>Super Admin Account</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {[
-            { label: 'Full Name', value: founderName, set: setFounderName },
-            { label: 'Email Address', value: founderEmail, set: setFounderEmail },
+            { label: 'Full Name', value: adminName, set: setAdminName },
+            { label: 'Email Address', value: adminEmail, set: setAdminEmail },
           ].map(f => (
             <div key={f.label}>
               <label className="block text-[11px] uppercase tracking-wider font-body font-600 mb-1.5" style={{ color: 'var(--text-secondary)' }}>{f.label}</label>

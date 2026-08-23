@@ -107,7 +107,7 @@ export default function LoginPage() {
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-[12px] font-mono font-600">
               <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
-              Founder & Admin Console
+              Super Admin Console
             </div>
             <h2 className="text-[34px] font-extrabold tracking-tight leading-tight font-heading">
               Intelligent pharmacy operations, centralized.
@@ -218,7 +218,7 @@ export default function LoginPage() {
               <div className="space-y-5">
                 <div>
                   <h1 className="text-[22px] font-bold font-heading" style={{ color: 'var(--text-primary)' }}>
-                    Founder Sign In
+                    Super Admin Sign In
                   </h1>
                   <p className="text-[13px] font-body mt-1" style={{ color: 'var(--text-secondary)' }}>
                     Enter your credentials to manage your platform
@@ -236,7 +236,7 @@ export default function LoginPage() {
                   <div className="flex items-center gap-2">
                     <i className="ri-key-2-line text-sky-600 text-[15px]" />
                     <span className="text-[12px] font-semibold text-sky-700 dark:text-sky-300 font-body">
-                      Demo Founder Access
+                      Demo Super Admin Access
                     </span>
                   </div>
                   <button
@@ -266,7 +266,7 @@ export default function LoginPage() {
                         type="email"
                         value={email}
                         onChange={e => setEmail(e.target.value)}
-                        placeholder="founder@klavora.io"
+                        placeholder="admin@klavora.io"
                         className="w-full h-11 pl-10 pr-3.5 rounded-xl text-[13px] font-body outline-none transition-all focus:ring-2 focus:ring-sky-500/30"
                         style={{
                           background: 'var(--bg)',
@@ -332,7 +332,7 @@ export default function LoginPage() {
               <div className="space-y-5">
                 <div>
                   <h1 className="text-[22px] font-bold font-heading" style={{ color: 'var(--text-primary)' }}>
-                    Founder Registration
+                    Super Admin Registration
                   </h1>
                   <p className="text-[13px] font-body mt-1" style={{ color: 'var(--text-secondary)' }}>
                     Request administrative credentials for Klavora
