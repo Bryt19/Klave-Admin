@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Badge from '@/components/base/Badge';
-import { pharmacies } from '@/mocks/pharmacies';
+import { pharmacies, type Pharmacy } from '@/mocks/pharmacies';
+import PharmacyDrawer from '@/pages/pharmacies/components/PharmacyDrawer';
 import { mrrData } from '@/mocks/subscriptions';
 import { supportTickets } from '@/mocks/support';
 import { signupChartData } from '@/mocks/activity';
@@ -55,13 +56,14 @@ const totalPharmacies = pharmacies.length;
 const activeSubscriptions = pharmacies.filter(p => p.status === 'Active').length;
 const trialPharmacies = pharmacies.filter(p => p.status === 'Trial').length;
 const openTickets = supportTickets.filter(t => t.status === 'Open').length;
-const churned = pharmacies.filter(p => p.status === 'Churned').length;
+const churned = pharmacies.filter(p => p.status === 'Suspended').length;
 
 const maxSignups = Math.max(...signupChartData.map(d => d.signups));
 
 export default function OverviewPage() {
   const navigate = useNavigate();
   const [hoveredBar, setHoveredBar] = useState<number | null>(null);
+  const [selectedPharmacy, setSelectedPharmacy] = useState<Pharmacy | null>(null);
   const greeting = getTimeBasedGreeting();
 
   const kpiCards = [
@@ -137,7 +139,7 @@ export default function OverviewPage() {
               <div
                 key={p.id}
                 className="p-3.5 sm:px-5 sm:py-3.5 table-row-hover cursor-pointer space-y-2 sm:space-y-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2"
-                onClick={() => navigate(`/pharmacies/${p.id}`)}
+                onClick={() => setSelectedPharmacy(p)}
                 style={{ borderBottom: '1px solid var(--border)' }}
               >
                 <div className="flex items-center gap-3 min-w-0">
@@ -152,7 +154,6 @@ export default function OverviewPage() {
 
                 <div className="flex items-center justify-between sm:justify-end gap-2.5 shrink-0 pt-1.5 sm:pt-0 border-t sm:border-t-0 border-dashed border-slate-200 dark:border-slate-800">
                   <div className="flex items-center gap-1.5">
-                    <Badge label={p.plan} />
                     <Badge label={p.status} />
                   </div>
                   <span className="text-[11px] font-mono font-medium whitespace-nowrap" style={{ color: 'var(--text-secondary)' }}>
@@ -253,6 +254,13 @@ export default function OverviewPage() {
           </div>
         </div>
       </div>
+
+      {selectedPharmacy && (
+        <PharmacyDrawer
+          pharmacy={selectedPharmacy}
+          onClose={() => setSelectedPharmacy(null)}
+        />
+      )}
     </div>
   );
 }
